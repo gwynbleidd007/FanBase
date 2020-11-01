@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <base target="_blank">
+    <title>FanHub</title>
+    <link rel="stylesheet" href="mainStyle.css">
+</head>
+
+<body>
+    <div id="searchBody">
+        <form action="" onsubmit="event.preventDefault();onSearch();">
+            <input type="text" id="search" placeholder="Search" autofocus />
+            <button type="submit">Search</button>
+        </form>
+    </div>
+    <div id="contentBox">
+        <div id="content" style="display: none;">
+            <!-- <div id="content"> -->
+            <h1 id="title" style="text-align: center;"></h1>
+            <div id="headContent">
+                <!-- Head -->
+                <div id="metaBox" class="boxCards">
+                    <div id="titleImage"></div>
+                    <div id="metaData"></div>
+                </div>
+                <div id="infoPlot" class="boxCards">
+                    <div id="information">
+                        <div>
+                            <h2>Information</h2>
+                        </div>
+                        <div id="informationBody"></div>
+                    </div>
+                    <div id="plot">
+                        <div>
+                            <h2>Plot</h2>
+                        </div>
+                        <div id="plotBody"></div>
+                    </div>
+                </div>
+                <div id="trailer" class="boxCards">
+                    <div class="headings">
+                        <h2>Trailer</h2>
+                    </div>
+                    <div id="trailerBody"></div>
+                </div>
+            </div>
+            <div id="bodyContent">
+                <!-- Body -->
+                <div id="synopsis" class="boxCards">
+                    <div class="headings" onclick="loadSynopsis();">
+                        <h2>Synopsis</h2>
+                    </div>
+                    <div id="synopsisBody" class="slider"></div>
+                </div>
+                <div id="crew" class="boxCards">
+                    <div class="headings" onclick="loadCrew();">
+                        <h2>Crew</h2>
+                    </div>
+                    <div id="crewBody" class="slider"></div>
+                </div>
+                <div id="cast" class="boxCards">
+                    <div class="headings" onclick="loadCast();">
+                        <h2>Cast</h2>
+                    </div>
+                    <div id="castBody" class="slider"></div>
+                </div>
+                <div id="images" class="boxCards">
+                    <div class="headings" onclick="loadImages()">
+                        <h2>Images</h2>
+                    </div>
+                    <div id="imagesBody" class="slider"></div>
+                </div>
+            </div>
+            <div id="footContent">
+                <!-- Foot -->
+                <div id="news" class="boxCards">
+                    <div class="headings" onclick="loadNews();">
+                        <h2>News</h2>
+                    </div>
+                    <div id="newsBody" class="slider"></div>
+                </div>
+                <div id="similar" class="boxCards">
+                    <!-- <div style="border-bottom: 1px solid black; cursor: pointer;"
+                        onclick="event.preventDefault();loadSimilar();"> -->
+                    <div class="headings" onclick="loadSimilar();">
+                        <h2>Similar To This</h2>
+                    </div>
+                    <div id="similarBody" class="slider"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src=".apikeys.js"></script>
+    <script src="mainjs.js"></script>
+</body>
+
+</html>

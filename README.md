@@ -1,12 +1,14 @@
 # FanBase
 A small website which is based on the basics of html, css and javascript and doesn't use any javascript module. The website searches for information about movies and shows using api calls from various api providers.
 
-The websites used are :
+The websites used for API's are :
 1. http://www.omdbapi.com/
 2. https://tastedive.com/api/
 3. https://rapidapi.com/hmerritt/api/imdb-internet-movie-database-unofficial
 4. https://rapidapi.com/apidojo/api/imdb8
 5. https://api.hillbillysoftware.com/api/swagger/ui/index
+
+The creator of the icon is : https://www.flaticon.com/authors/freepik
 
 ### Note : create a .apikeys.js file in the directory and add the code below in it
 

@@ -1,6 +1,7 @@
 // SETTING UP THE GLOBAL VARIABLES
-let search = "";
-let imdbID = "";
+let search = '';
+let imdbID = '';
+let notFound = false;
 const crossProxy = 'https://cors-anywhere.herokuapp.com/';
 const loader = `<div class="loader"></div>`
 
@@ -21,8 +22,6 @@ const docObjects = {
 
 // OBJECT TO STORE API CALLS
 let apiCalls = {
-    // tastedive: false,
-    // omdb: false,
     synopsis: false,
     crew: false,
     cast: false,
@@ -33,7 +32,10 @@ let apiCalls = {
 
 // RESET THE SITE
 clearSite = () => {
+    search = '';
+    imdbID = '';
     document.getElementById('content').style.display = 'none';
+    notFound = false;
     for (let i in docObjects) {
         docObjects[i].innerHTML = '';
     }
@@ -75,6 +77,8 @@ showHide = (dom) => {
 }
 
 loadSynopsis = async () => {
+    if (imdbID === '' || imdbID === undefined)
+        return;
     if (apiCalls.synopsis === false) {
         try {
             addLoader(docObjects.synopsisBody);
@@ -99,6 +103,8 @@ loadSynopsis = async () => {
 }
 
 loadCrew = async () => {
+    if (imdbID === '' || imdbID === undefined)
+        return;
     if (apiCalls.crew === false) {
         try {
             addLoader(docObjects.crewBody);
@@ -119,7 +125,6 @@ loadCrew = async () => {
                     strLst.push(`<a href="https://www.imdb.com${element.id}">${element.name}</a>`);
                 });
                 strLst = strLst.join(', ');
-                // docObjects.crewBody.insertAdjacentHTML('beforeend', `<div><h3>${i[0].toUpperCase() + i.slice(1)}</h3><p>${strLst}</p></div>`);
                 str = str.concat(`<div><h3>${i[0].toUpperCase() + i.slice(1)}</h3><p>${strLst}</p></div>`);
             }
             docObjects.crewBody.innerHTML = str;
@@ -132,6 +137,8 @@ loadCrew = async () => {
 }
 
 loadCast = async () => {
+    if (imdbID === '' || imdbID === undefined)
+        return;
     if (apiCalls.cast === false) {
         try {
             addLoader(docObjects.castBody);
@@ -145,8 +152,6 @@ loadCast = async () => {
             }).then(res => res.json());
             apiCalls.cast = true;
             removeLoader(docObjects.castBody);
-            // let IMDcast = IMD.cast;
-            // let IMDtech = IMD.technical_specs;
             let actorTableString = `<table><tr><th>Actor</th><th>Role</th></tr>`;
             IMD.cast.forEach(element => {
                 actorTableString = actorTableString.concat(`<tr><td><a href="https://www.imdb.com/name/${element.actor_id}/">${element.actor}</a></td><td>${element.character}</td></tr>`);
@@ -162,6 +167,8 @@ loadCast = async () => {
 }
 
 loadImages = async () => {
+    if (imdbID === '' || imdbID === undefined)
+        return;
     if (apiCalls.images === false) {
         try {
             addLoader(docObjects.imagesBody);
@@ -183,11 +190,12 @@ loadImages = async () => {
     }
     else {
         docObjects.imagesBody.style.height = docObjects.imagesBody.style.height === '0px' ? 'auto' : '0px';
-        // showHide(docObjects.imagesBody);
     }
 }
 
 loadNews = async () => {
+    if (imdbID === '' || imdbID === undefined)
+        return;
     if (apiCalls.news === false) {
         try {
             addLoader(docObjects.newsBody);
@@ -201,7 +209,6 @@ loadNews = async () => {
             }).then((res) => { return res.json() });
             apiCalls.news = true;
             removeLoader(docObjects.newsBody);
-            // news = news.items;
             let str = "";
             news.items.forEach(req => {
                 str = str.concat(`<div><h3><a href="${req.link}">${req.head}</a></h3><p>${req.body + "..."}</p></div>`);
@@ -225,66 +232,74 @@ onSearch = async () => {
     // GETTING THE SEARCH TERM
     search = encodeURI(document.getElementById("search").value);
     // SETTING THE LOADER
-    // const loader = `<div class="loader"></div>`
     document.getElementById('contentBox').insertAdjacentHTML('afterbegin', loader);
 
+    let url, tastedrive, tasteInfo, omdb;
+    let metaDataStr = "";
+
+    // WORKING WITH OMDB
     try {
-        // WORKING WITH TASTEDRIVE
-        let url = apiKeys.tastedrive + search;
-        let tastedrive = await fetch(`${crossProxy}${url}`).then(res => res.json());
-        // apiCalls.tastedive = true;
-        let tasteInfo = tastedrive.Similar.Info[0];
-        search = encodeURI(tasteInfo.Name);
-
-        // WORKING WITH OMDB
         url = apiKeys.omdb + search;
-        let omdb = await fetch(url).then(res => res.json());
-        // apiCalls.omdb = true;
+        omdb = await fetch(url).then(res => res.json());
         imdbID = omdb.imdbID;
-        // search = encodeURI(omdb.Title);
-
-        // SETTING THE TITLE
-        document.getElementById('title').innerText = omdb.Title;
-
-        // SETTING THE POSTER
-        docObjects.titleImage.innerHTML = `<img id="imgPoster" src=${omdb.Poster}/>`
-
-        // SETTING THE METADATA
-        let metaData = ["Title", "Year", "Rated", "Released", "Runtime", "Genre", "totalSeasons", "Language", "Country", "imdbRating", "Type"];
-        docObjects.metaData.innerHTML = "<hr/>";
-        metaData.forEach(element => {
-            docObjects.metaData.insertAdjacentHTML('beforeend', `<h4 style="display: inline;">${element} : </h4><p style="display: inline;">${omdb[element]}</p><br/>`);
-        });
-        docObjects.metaData.insertAdjacentHTML('beforeend', `<hr/><h4 style="text-align: center;"><a href="${tasteInfo.wUrl}" >Wikipedia</a> | <a href="https://www.imdb.com/title/${imdbID}/">IMDB</a></h4><br/>`);
-
-        // SETTING UP INFORMATION AND PLOTS
-        docObjects.informationBody.innerHTML = `<p>${tasteInfo.wTeaser}</p>`;
-        docObjects.plotBody.innerHTML = `<p>${omdb.Plot}</p>`;
-
-        // SETTING THE TRAILER
-        docObjects.trailerBody.innerHTML = ` <iframe src="${tasteInfo.yUrl}" frameborder="0" allowfullscreen id="trailerVideo"></iframe> `;
-
-        // SETTING THE SIMILARS
-        tastedrive.Similar.Results.forEach(req => {
-            docObjects.similarBody.insertAdjacentHTML('beforeend', `<div><h3><a href="${req.wUrl}">${req.Name}</a></h3><p>${req.wTeaser}</p></div>`);
-        });
+        if (omdb.Title) {
+            search = encodeURI(omdb.Title);
+            // SETTING THE POSTER
+            docObjects.titleImage.innerHTML = `<img id="imgPoster" src=${omdb.Poster}/>`
+            // SETTING THE METADATA
+            let metaData = ["Title", "Year", "Rated", "Released", "Runtime", "Genre", "totalSeasons", "Language", "Country", "imdbRating", "Type"];
+            metaDataStr = "<hr/>";
+            metaData.forEach(element => {
+                metaDataStr = metaDataStr.concat(`<h4 style="display: inline;">${element} : </h4><p style="display: inline;">${omdb[element]}</p><br/>`);
+            });
+            metaDataStr = metaDataStr.concat(`<hr/>`);
+            // SETTING THE PLOT
+            docObjects.plotBody.innerHTML = `<p>${omdb.Plot}</p>`;
+        }
     } catch { err => { console.log(err) } };
+
+    // WORKING WITH TASTEDRIVE
+    try {
+        url = apiKeys.tastedrive + search;
+        tastedrive = await fetch(`${crossProxy}${url}`).then(res => res.json());
+        tasteInfo = tastedrive.Similar.Info[0];
+        // search = encodeURI(tasteInfo.Name);
+        if (tasteInfo.wUrl) {
+            // SETTING INFORMATION AND TRAILER
+            docObjects.informationBody.innerHTML = `<p>${tasteInfo.wTeaser}</p>`;
+            docObjects.trailerBody.innerHTML = ` <iframe src="${tasteInfo.yUrl}" frameborder="0" allowfullscreen id="trailerVideo"></iframe> `;
+            // SETTING THE SIMILARS
+            tastedrive.Similar.Results.forEach(req => {
+                docObjects.similarBody.insertAdjacentHTML('beforeend', `<div><h3><a href="${req.wUrl}">${req.Name}</a></h3><p>${req.wTeaser}</p></div>`);
+            });
+        }
+    } catch { err => { console.log(err) } };
+
+    // SETTING THE LINKS IN METADATA
+    metaDataStr = metaDataStr.concat(`<h4 style="text-align: center;">`);
+    if (omdb.Title) {
+        metaDataStr = metaDataStr.concat(`<a href="https://www.imdb.com/title/${imdbID}/">IMDB</a>`);
+    }
+    if (tasteInfo.wUrl) {
+        metaDataStr = metaDataStr.concat(` | <a href="${tasteInfo.wUrl}" >Wikipedia</a>`);
+    }
+    metaDataStr = metaDataStr.concat(`</h4><br/>`);
+
+    // SETTING THE TITLE
+    if (omdb.Title)
+        document.getElementById('title').innerText = omdb.Title;
+    else if (tasteInfo.wUrl) {
+        document.getElementById('title').innerText = tasteInfo.Name;
+    }
+    else {
+        document.getElementById('title').innerText = "Oops!!! Not Found";
+        notFound = true;
+    }
+    docObjects.metaData.innerHTML = metaDataStr;
 
     // MAKING THE DIV BLOCK VISIBLE
     document.getElementsByClassName("loader")[0].remove();
     document.getElementById("content").style.display = '';
-
-
-    // let synopsis = await fetch(`https://imdb8.p.rapidapi.com/title/get-synopses?tconst=${imdbID}`, {
-    //     "method": "GET",
-    //     "headers": {
-    //         "x-rapidapi-host": "imdb8.p.rapidapi.com",
-    //         "x-rapidapi-key": apiKeys.x_rapidapi_key
-    //     }
-    // }).then(response => {
-    //     return response.json();
-    // })
-
 }
 
 // METADATA

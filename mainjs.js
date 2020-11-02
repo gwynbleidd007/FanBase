@@ -1,7 +1,7 @@
 // SETTING UP THE GLOBAL VARIABLES
 let search = '';
 let imdbID = '';
-let notFound = false;
+let tasteNotFound = false;
 const crossProxy = 'https://cors-anywhere.herokuapp.com/';
 const loader = `<div class="loader"></div>`
 
@@ -10,8 +10,9 @@ const docObjects = {
     title: document.getElementById('title'),
     titleImage: document.getElementById("titleImage"),
     metaData: document.getElementById("metaData"),
-    informationBody: document.getElementById("informationBody"),
-    plotBody: document.getElementById('plotBody'),
+    // informationBody: document.getElementById("informationBody"),
+    // plotBody: document.getElementById('plotBody'),
+    infoPlot: document.getElementById('infoPlot'),
     trailerBody: document.getElementById("trailerBody"),
     synopsisBody: document.getElementById('synopsisBody'),
     crewBody: document.getElementById("crewBody"),
@@ -36,7 +37,11 @@ clearSite = () => {
     search = '';
     imdbID = '';
     document.getElementById('content').style.display = 'none';
-    notFound = false;
+    tasteNotFound = false;
+    let loaders = document.getElementsByClassName("loader");
+    for (let i = 0; i < loaders.length; ++i) {
+        loaders[i].remove();
+    }
     for (let i in docObjects) {
         docObjects[i].innerHTML = '';
     }
@@ -77,8 +82,19 @@ showHide = (dom) => {
     }
 }
 
+loadTrailer = () => {
+    if (tasteNotFound)
+        return;
+    if (docObjects.trailerBody.offsetHeight === 0) {
+        docObjects.trailerBody.style.paddingBottom = `min(56.25%, 585px)`;
+    }
+    else {
+        docObjects.trailerBody.style.paddingBottom = '0px';
+    }
+}
+
 loadSynopsis = async () => {
-    if (imdbID === '' || imdbID === undefined)
+    if (!imdbID)
         return;
     if (apiCalls.synopsis === false) {
         try {
@@ -104,7 +120,7 @@ loadSynopsis = async () => {
 }
 
 loadCrew = async () => {
-    if (imdbID === '' || imdbID === undefined)
+    if (!imdbID)
         return;
     if (apiCalls.crew === false) {
         try {
@@ -138,7 +154,7 @@ loadCrew = async () => {
 }
 
 loadCast = async () => {
-    if (imdbID === '' || imdbID === undefined)
+    if (!imdbID)
         return;
     if (apiCalls.cast === false) {
         try {
@@ -168,7 +184,7 @@ loadCast = async () => {
 }
 
 loadImages = async () => {
-    if (imdbID === '' || imdbID === undefined)
+    if (!imdbID)
         return;
     if (apiCalls.images === false) {
         try {
@@ -181,7 +197,7 @@ loadImages = async () => {
             for (let i in images) {
                 if (Array.isArray(images[i]) === true) {
                     images[i].forEach(element => {
-                        str = str.concat(`<img src="${element}" alt=""/>`);
+                        str = str.concat(`<a href="${element}"><img src="${element}" alt=""/></a>`);
                     });
                 }
             }
@@ -195,7 +211,7 @@ loadImages = async () => {
 }
 
 loadNews = async () => {
-    if (imdbID === '' || imdbID === undefined)
+    if (!imdbID)
         return;
     if (apiCalls.news === false) {
         try {
@@ -224,6 +240,8 @@ loadNews = async () => {
 }
 
 loadSimilar = () => {
+    if (tasteNotFound)
+        return;
     showHide(docObjects.similarBody);
 }
 
@@ -236,52 +254,73 @@ onSearch = async () => {
     document.getElementById('contentBox').insertAdjacentHTML('afterbegin', loader);
 
     let url, tastedrive, tasteInfo, omdb;
-    let metaDataStr = "";
+    let metaDataStr = "", infoPlot = "";
 
+    // WORKING WITH OMDB
     try {
-        // WORKING WITH OMDB
         url = apiKeys.omdb + search;
         omdb = await fetch(url).then(res => res.json());
         imdbID = omdb.imdbID;
-        if (omdb.Title) {
-            search = encodeURI(omdb.Title);
-            // SETTING THE POSTER
-            docObjects.titleImage.innerHTML = `<img id="imgPoster" src=${omdb.Poster}/>`
-            // SETTING THE METADATA
-            let metaData = ["Title", "Year", "Rated", "Released", "Runtime", "Genre", "totalSeasons", "Language", "Country", "imdbRating", "Type"];
-            metaDataStr = "<hr/>";
-            metaData.forEach(element => {
-                metaDataStr = metaDataStr.concat(`<h4 style="display: inline;">${element} : </h4><p style="display: inline;">${omdb[element]}</p><br/>`);
-            });
-            metaDataStr = metaDataStr.concat(`<hr/>`);
-            metaDataStr = metaDataStr.concat(`<h4 style="text-align: center;">`);
-
-            metaDataStr = metaDataStr.concat(`<a href="https://www.imdb.com/title/${imdbID}/">IMDB</a>`);
-
-            // SETTING THE PLOT
-            docObjects.plotBody.innerHTML = `<p>${omdb.Plot}</p>`;
-
-            // WORKING WITH TASTEDRIVE
-            try {
-                url = apiKeys.tastedrive + search;
-                tastedrive = await fetch(`${crossProxy}${url}`).then(res => res.json());
-                tasteInfo = tastedrive.Similar.Info[0];
-                if (tasteInfo.wUrl) {
-                    // SETTING INFORMATION AND TRAILER
-                    docObjects.informationBody.innerHTML = `<p>${tasteInfo.wTeaser}</p>`;
-                    docObjects.trailerBody.innerHTML = ` <iframe src="${tasteInfo.yUrl}" frameborder="0" allowfullscreen id="trailerVideo"></iframe> `;
-                    // SETTING THE SIMILARS
-                    tastedrive.Similar.Results.forEach(req => {
-                        docObjects.similarBody.insertAdjacentHTML('beforeend', `<div><h3><a href="${req.wUrl}">${req.Name}</a></h3><p>${req.wTeaser}</p></div>`);
-                    });
-                    metaDataStr = metaDataStr.concat(` | <a href="${tasteInfo.wUrl}" >Wikipedia</a>`);
-                }
-            } catch { err => { console.log(err) } };
-            metaDataStr = metaDataStr.concat(`</h4><br/>`);
-            docObjects.metaData.innerHTML = metaDataStr;
-            document.getElementById("content").style.display = '';
-        }
     } catch { err => { console.log(err) } };
+
+    if (omdb.Title) {
+        search = encodeURI(omdb.Title);
+        // SETTING THE POSTER
+        docObjects.titleImage.innerHTML = `<img id="imgPoster" src=${omdb.Poster}/>`
+        // SETTING THE METADATA
+        let metaData = ["Title", "Year", "Rated", "Released", "Runtime", "Genre", "totalSeasons", "Language", "Country", "imdbRating", "Type"];
+        metaDataStr = "<hr/>";
+        metaData.forEach(element => {
+            metaDataStr = metaDataStr.concat(`<h4 style="display: inline;">${element} : </h4><p style="display: inline;">${omdb[element]}</p><br/>`);
+        });
+        metaDataStr = metaDataStr.concat(`<hr/>`);
+        metaDataStr = metaDataStr.concat(`<h4 style="text-align: center;">`);
+
+        metaDataStr = metaDataStr.concat(`<a href="https://www.imdb.com/title/${imdbID}/">IMDB</a>`);
+
+        // SETTING THE PLOT
+        infoPlot = infoPlot.concat(`
+                <div id="plot">
+                    <div>
+                        <h2>Plot</h2>
+                    </div>
+                    <div id="plotBody"><p>${omdb.Plot}</p></div>
+                </div>
+            `);
+        // docObjects.plotBody.innerHTML = `<p>${omdb.Plot}</p>`;
+
+        // WORKING WITH TASTEDRIVE
+        url = apiKeys.tastedrive + search;
+        try {
+            tastedrive = await fetch(`${crossProxy + url}`).then(res => res.json());
+            tasteInfo = tastedrive.Similar.Info[0];
+        } catch { err => { console.log(err) } };
+        if (tasteInfo && tasteInfo.wUrl) {
+            // SETTING INFORMATION AND TRAILER
+            infoPlot = `
+                        <div id="information">
+                            <div>
+                                <h2>Information</h2>
+                            </div>
+                            <div id="informationBody"><p>${tasteInfo.wTeaser}</p></div>
+                        </div>
+                    `.concat(infoPlot);
+            // docObjects.informationBody.innerHTML = `<p>${tasteInfo.wTeaser}</p>`;
+            docObjects.trailerBody.innerHTML = ` <iframe src="${tasteInfo.yUrl}" frameborder="0" allowfullscreen id="trailerVideo"></iframe> `;
+            // SETTING THE SIMILARS
+            tastedrive.Similar.Results.forEach(req => {
+                docObjects.similarBody.insertAdjacentHTML('beforeend', `<div><h3><a href="${req.wUrl}">${req.Name}</a></h3><p>${req.wTeaser}</p></div>`);
+            });
+            metaDataStr = metaDataStr.concat(` | <a href="${tasteInfo.wUrl}" >Wikipedia</a>`);
+        }
+        else {
+            tasteNotFound = true;
+        }
+        metaDataStr = metaDataStr.concat(`</h4><br/>`);
+        docObjects.metaData.innerHTML = metaDataStr;
+        docObjects.infoPlot.innerHTML = infoPlot;
+        document.getElementById("content").style.display = '';
+    }
 
     // REMOVING LOADER
     document.getElementsByClassName("loader")[0].remove();
@@ -292,6 +331,5 @@ onSearch = async () => {
     }
     else {
         docObjects.title.innerText = "Oops!!! Not Found";
-        notFound = true;
     }
 }

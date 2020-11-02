@@ -11,16 +11,21 @@
 </head>
 
 <body>
+    <div id="header" style="display: flex;justify-content: center;align-content: center;align-self: center;">
+        <!-- <img width="49px" height="49px" src="search.png" alt="" />
+        <h1>FanHub</h1> -->
+        <img style="margin: auto 2px;" width="49px" height="49px" src="search.png" alt="" style="margin: auto;" />
+        <h1>FanHub</h1>
+    </div>
     <div id="searchBody">
         <form action="" onsubmit="event.preventDefault();onSearch();">
-            <input type="text" id="search" placeholder="Search" autofocus />
+            <input type="text" id="search" placeholder="Movie/Show" autofocus />
             <button type="submit">Search</button>
         </form>
     </div>
     <div id="contentBox">
         <h1 id="title"></h1>
         <div id="content" style="display: none;">
-            <!-- <div id="content"> -->
             <div id="headContent">
                 <!-- Head -->
                 <div id="metaBox" class="boxCards">
@@ -28,7 +33,7 @@
                     <div id="metaData"></div>
                 </div>
                 <div id="infoPlot" class="boxCards">
-                    <div id="information">
+                    <!-- <div id="information">
                         <div>
                             <h2>Information</h2>
                         </div>
@@ -39,13 +44,13 @@
                             <h2>Plot</h2>
                         </div>
                         <div id="plotBody"></div>
-                    </div>
+                    </div> -->
                 </div>
                 <div id="trailer" class="boxCards">
-                    <div class="headings">
+                    <div class="headings" onclick="loadTrailer()">
                         <h2>Trailer</h2>
                     </div>
-                    <div id="trailerBody"></div>
+                    <div id="trailerBody" class="slider"></div>
                 </div>
             </div>
             <div id="bodyContent">
@@ -84,8 +89,6 @@
                     <div id="newsBody" class="slider"></div>
                 </div>
                 <div id="similar" class="boxCards">
-                    <!-- <div style="border-bottom: 1px solid black; cursor: pointer;"
-                        onclick="event.preventDefault();loadSimilar();"> -->
                     <div class="headings" onclick="loadSimilar();">
                         <h2>Similar To This</h2>
                     </div>

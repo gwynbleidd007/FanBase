@@ -23,6 +23,10 @@ h3+p, h2+p{
   padding-left: 0.5rem;
 }
 
+hr{
+  box-shadow: 1px 1px 2px #000000;
+}
+
 form{
   display: flex;
   justify-content: center;
@@ -33,12 +37,13 @@ button{
   background-color: #353535;
   border-color: #353535;
   border-radius: 5px;
-  height: 3.8rem;
+  height: 3.9rem;
   max-width: 10rem;
   width: 100%;
   font-size: x-large;
   cursor: pointer;
   color: white;
+  outline: none;
 }
 
 button:hover{
@@ -106,7 +111,7 @@ table{
   background-color: #636363;
   width: 88%;
   max-width: 85rem;
-  min-height: 70vh;
+  min-height: 55vh;
   margin-top: 2rem;
   margin-left: auto;
   margin-right: auto;
@@ -146,11 +151,10 @@ table{
 
 #trailerBody{
   position: relative;
-  width: 75vw;
-  max-width: 1024px;
+  width: min(75vw, 1024px);
   height: 0;
   margin-top: 1rem;
-  padding-bottom: 56.25%;
+  padding-bottom: 0px;
   margin-left: auto;
   margin-right: auto;
 }
@@ -169,9 +173,6 @@ table{
   display: flex;
   flex-wrap: wrap;
   justify-content: space-evenly;
-  /* align-content: space-around; */
-  /* display: inline-grid; */
-  /* justify-items: center; */
 }
 
 #imagesBody img{
@@ -215,10 +216,6 @@ table{
   box-shadow: 1px 1px 2px #000000;
 }
 
-/* .boxCards:hover{
- box-shadow: 1px 1px 2px #000000; 
-} */
-
 .headings{
   border-bottom: 1px solid black;
   cursor: pointer;
@@ -228,7 +225,9 @@ table{
   height: 0px;
   padding-left: 1rem;
   overflow: hidden;
-  transition: all 1s ease-in-out;
+  transition-property: height, padding;
+  transition-duration: 1s;
+  transition-timing-function: ease-in-out;
 }
 
 @media screen and (max-width: 600px) {
@@ -240,14 +239,8 @@ table{
     padding: 1px;
   }
   #trailerBody{
-    width: 98vw;
+    width: 99vw;
     padding-left: 0px;
     left: -1rem;
-  }
-}
-
-@media screen and (min-width: 1024px) {
-  #trailerBody{
-    padding-bottom: 576px;
   }
 }

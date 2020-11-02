@@ -95,12 +95,12 @@ table{
   font-size: large;
   background-color: darkgrey;
   border-color: darkgrey;
+  outline: none;
 }
 
 #searchBody{
   margin-top: 2.5rem;
 }
-
 
 #contentBox{
   background-color: #636363;
@@ -111,9 +111,14 @@ table{
   margin-left: auto;
   margin-right: auto;
   margin-bottom: 2.5rem;
-  padding: 1.5rem;
+  padding: 0.5rem 1.5rem;
   border: 1px solid black;
   border-radius: 1.5rem;
+}
+
+#title{
+  text-align: center;
+  /* padding-bottom: 1rem; */
 }
 
 #imgPoster{

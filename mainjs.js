@@ -183,6 +183,12 @@ loadCast = async () => {
     }
 }
 
+deleteBrokenImages = (el) => {
+    // console.log(el.parentElement);
+    // console.log(el.parentNode);
+    el.parentElement.remove();
+}
+
 loadImages = async () => {
     if (!imdbID)
         return;
@@ -197,7 +203,7 @@ loadImages = async () => {
             for (let i in images) {
                 if (Array.isArray(images[i]) === true) {
                     images[i].forEach(element => {
-                        str = str.concat(`<a href="${element}"><img src="${element}" alt=""/></a>`);
+                        str = str.concat(`<a href="${element}"><img src="${element}" onerror="deleteBrokenImages(this);"/></a>`);
                     });
                 }
             }

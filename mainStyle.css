@@ -116,7 +116,7 @@ table{
   margin-left: auto;
   margin-right: auto;
   margin-bottom: 2.5rem;
-  padding: 0.5rem 1.5rem;
+  padding: 0.5rem 1.5rem 1.5rem 1.5rem;
   border: 1px solid black;
   border-radius: 1.5rem;
 }
@@ -176,8 +176,8 @@ table{
 }
 
 #imagesBody img{
+  width: min(100%,auto);
   max-height: 420px;
-  width: auto;
   margin: 6px;
 }
 
